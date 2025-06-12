@@ -44,7 +44,14 @@ pipeline {
       steps {
         withCredentials([usernamePassword(credentialsId: 'aws-ecr', passwordVariable: 'AWS_SECRET', usernameVariable: 'AWS_ACCESS_KEY')]) {
           script {
-            sh """
+            // sh """
+            //   aws configure set aws_access_key_id $AWS_ACCESS_KEY
+            //   aws configure set aws_secret_access_key $AWS_SECRET
+            //   aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin ${AWS_ECR_URI}
+            //   docker tag ${IMAGE_NAME} ${AWS_ECR_URI}
+            //   docker push ${AWS_ECR_URI}
+            // """
+            bat """
               aws configure set aws_access_key_id $AWS_ACCESS_KEY
               aws configure set aws_secret_access_key $AWS_SECRET
               aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin ${AWS_ECR_URI}
