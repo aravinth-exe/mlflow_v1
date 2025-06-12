@@ -4,6 +4,7 @@ pipeline {
   environment {
     IMAGE_NAME = "aravinthexe/mlflow_app_v1"
     AWS_ECR_URI = "994390684427.dkr.ecr.eu-north-1.amazonaws.com/mlflow"
+    REGION = "eu-north-1"
   }
 
   stages {
@@ -22,16 +23,20 @@ pipeline {
     stage('Build Docker Image') {
       steps {
         script {
-          docker.build("${IMAGE_NAME}")
+          docker.build("${IMAGE_NAME}:latest")
         }
       }
     }
 
     stage('Push to Docker Hub') {
       steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+        withCredentials([usernamePassword(
+          credentialsId: 'dockerhub',
+          passwordVariable: 'DOCKER_PASSWORD',
+          usernameVariable: 'DOCKER_USERNAME'
+        )]) {
           script {
-            sh """
+            bat """
               echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
               docker push ${IMAGE_NAME}
             """
@@ -42,7 +47,10 @@ pipeline {
 
     stage('Push to AWS ECR') {
       steps {
-        withCredentials([usernamePassword(credentialsId: 'aws-ecr', passwordVariable: 'AWS_SECRET', usernameVariable: 'AWS_ACCESS_KEY')]) {
+         withCredentials([
+          string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+          string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
+        ]) {
           script {
             // sh """
             //   aws configure set aws_access_key_id $AWS_ACCESS_KEY
