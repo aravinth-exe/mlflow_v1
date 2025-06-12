@@ -7,9 +7,15 @@ pipeline {
   }
 
   stages {
+    // stage('Checkout') {
+    //   steps {
+    //     git 'https://github.com/aravinth-exe/mlflow_v1.git', branch: 'main'
+    //   }
+    // }
+
     stage('Checkout') {
       steps {
-        git 'https://github.com/aravinth-exe/mlflow_v1.git'
+        checkout scm
       }
     }
 
@@ -41,7 +47,7 @@ pipeline {
             sh """
               aws configure set aws_access_key_id $AWS_ACCESS_KEY
               aws configure set aws_secret_access_key $AWS_SECRET
-              aws ecr get-login-password --region your-region | docker login --username AWS --password-stdin ${AWS_ECR_URI}
+              aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin ${AWS_ECR_URI}
               docker tag ${IMAGE_NAME} ${AWS_ECR_URI}
               docker push ${AWS_ECR_URI}
             """
