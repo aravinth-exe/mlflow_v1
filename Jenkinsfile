@@ -2,14 +2,14 @@ pipeline {
   agent any
 
   environment {
-    IMAGE_NAME = "yourdockerhubusername/your-image-name"
-    AWS_ECR_URI = "your-aws-account-id.dkr.ecr.region.amazonaws.com/your-repo-name"
+    IMAGE_NAME = "aravinth.exe/fastapi_app_v1"
+    AWS_ECR_URI = "994390684427.dkr.ecr.eu-north-1.amazonaws.com/mlflow"
   }
 
   stages {
     stage('Checkout') {
       steps {
-        git 'https://github.com/yourusername/your-repo.git'
+        git 'https://github.com/aravinth-exe/mlflow_v1.git'
       }
     }
 
