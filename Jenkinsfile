@@ -8,12 +8,6 @@ pipeline {
   }
 
   stages {
-    // stage('Checkout') {
-    //   steps {
-    //     git 'https://github.com/aravinth-exe/mlflow_v1.git', branch: 'main'
-    //   }
-    // }
-
     stage('Checkout') {
       steps {
         checkout scm
@@ -39,8 +33,8 @@ pipeline {
         )]) {
           script {
             bat """
-              echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-              docker push ${IMAGE_NAME}:latest
+              echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin
+              docker push %IMAGE_NAME%:latest
             """
           }
         }
@@ -49,24 +43,17 @@ pipeline {
 
     stage('Push to AWS ECR') {
       steps {
-         withCredentials([
+        withCredentials([
           string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
           string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
         ]) {
           script {
-            // sh """
-            //   aws configure set aws_access_key_id $AWS_ACCESS_KEY
-            //   aws configure set aws_secret_access_key $AWS_SECRET
-            //   aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin ${AWS_ECR_URI}
-            //   docker tag ${IMAGE_NAME} ${AWS_ECR_URI}
-            //   docker push ${AWS_ECR_URI}
-            // """
             bat """
               aws configure set aws_access_key_id %AWS_ACCESS_KEY_ID%
               aws configure set aws_secret_access_key %AWS_SECRET_ACCESS_KEY%
               aws ecr get-login-password --region %REGION% | docker login --username AWS --password-stdin %AWS_ECR_URI%
-              docker tag mlflow:latest 994390684427.dkr.ecr.eu-north-1.amazonaws.com/mlflow:latest
-              docker push 994390684427.dkr.ecr.eu-north-1.amazonaws.com/mlflow:latest
+              docker tag %IMAGE_NAME%:latest %AWS_ECR_URI%:latest
+              docker push %AWS_ECR_URI%:latest
             """
           }
         }
@@ -85,24 +72,11 @@ pipeline {
               aws configure set aws_secret_access_key %AWS_SECRET_ACCESS_KEY%
               aws ecs update-service ^
                 --cluster timeseries-forecasting ^
-                --service timeseries-forecasting-service-6nxf55dq ^
+                --service timeseries-forecasting-service-3c4jeu0g ^
                 --force-new-deployment ^
                 --region %REGION%
             """
           }
-        }
-      }
-    }
-
-    stage('Verify Deployment') {
-      steps {
-        script {
-          bat """
-            aws ecs describe-services ^
-              --cluster timeseries-forecasting ^
-              --services timeseries-forecasting-service-3c4jeu0g ^
-              --region %REGION%
-          """
         }
       }
     }
