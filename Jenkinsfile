@@ -70,5 +70,26 @@ pipeline {
         }
       }
     }
+
+    stage('Deploy to ECS') {
+      steps {
+        withCredentials([
+          string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+          string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
+        ]) {
+          script {
+            bat """
+              aws configure set aws_access_key_id %AWS_ACCESS_KEY_ID%
+              aws configure set aws_secret_access_key %AWS_SECRET_ACCESS_KEY%
+              aws ecs update-service ^
+                --cluster timeseries-forecasting ^
+                --service timeseries-forecasting-service-6nxf55dq ^
+                --force-new-deployment ^
+                --region eu-north-1
+            """
+          }
+        }
+      }
+    }
   }
 }
