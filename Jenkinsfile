@@ -23,7 +23,7 @@ pipeline {
     stage('Build Docker Image') {
       steps {
         script {
-          docker.build("${IMAGE_NAME}:latest")
+          docker.build("${IMAGE_NAME}:latest", "--no-cache")
         }
       }
     }
@@ -62,9 +62,9 @@ pipeline {
             bat """
               aws configure set aws_access_key_id %AWS_ACCESS_KEY_ID%
               aws configure set aws_secret_access_key %AWS_SECRET_ACCESS_KEY%
-              aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 994390684427.dkr.ecr.eu-north-1.amazonaws.com
-              docker tag aravinthexe/mlflow_app_v1:latest 994390684427.dkr.ecr.eu-north-1.amazonaws.com/fastapi:latest
-              docker push 994390684427.dkr.ecr.eu-north-1.amazonaws.com/fastapi:latest
+              aws ecr get-login-password --region %REGION% | docker login --username AWS --password-stdin %AWS_ECR_URI%
+              docker tag mlflow:latest 994390684427.dkr.ecr.eu-north-1.amazonaws.com/mlflow:latest
+              docker push 994390684427.dkr.ecr.eu-north-1.amazonaws.com/mlflow:latest
             """
           }
         }
