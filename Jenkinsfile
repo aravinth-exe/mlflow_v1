@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    IMAGE_NAME = "aravinth.exe/fastapi_app_v1"
+    IMAGE_NAME = "aravinthexe/mlflow_app_v1"
     AWS_ECR_URI = "994390684427.dkr.ecr.eu-north-1.amazonaws.com/mlflow"
   }
 
