@@ -100,7 +100,7 @@ pipeline {
           bat """
             aws ecs describe-services ^
               --cluster timeseries-forecasting ^
-              --services timeseries-forecasting-service-6nxf55dq ^
+              --services timeseries-forecasting-service-3c4jeu0g ^
               --region %REGION%
           """
         }
