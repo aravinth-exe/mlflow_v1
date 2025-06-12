@@ -40,7 +40,7 @@ pipeline {
           script {
             bat """
               echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-              docker push ${IMAGE_NAME}
+              docker push ${IMAGE_NAME}:latest
             """
           }
         }
@@ -87,9 +87,22 @@ pipeline {
                 --cluster timeseries-forecasting ^
                 --service timeseries-forecasting-service-6nxf55dq ^
                 --force-new-deployment ^
-                --region eu-north-1
+                --region %REGION%
             """
           }
+        }
+      }
+    }
+
+    stage('Verify Deployment') {
+      steps {
+        script {
+          bat """
+            aws ecs describe-services ^
+              --cluster timeseries-forecasting ^
+              --services timeseries-forecasting-service-6nxf55dq ^
+              --region %REGION%
+          """
         }
       }
     }
